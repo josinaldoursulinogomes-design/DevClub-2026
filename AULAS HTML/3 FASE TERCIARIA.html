@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 3 - Laboratório de Proporções Livres</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        .laboratorio-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .coluna {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+
+        .titulo-coluna { font-size: 16px; font-weight: bold; color: #444; border-bottom: 2px solid #ddd; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bloco-input-cor { margin-bottom: 18px; }
+        .label-instrucao { font-weight: bold; color: #555; display: block; margin-bottom: 6px; font-size: 14px; }
+        
+        .campo-numerico-wrapper { display: flex; align-items: center; }
+        .input-porcentagem { width: 75px; font-size: 18px; padding: 6px; border: 2px solid #ccc; border-radius: 6px; text-align: center; font-weight: bold; margin-right: 8px; }
+        .input-porcentagem:focus { border-color: #007bff; outline: none; }
+        .texto-auxiliar { font-size: 16px; font-weight: bold; color: #333; }
+
+        .barra-progresso-bg { width: 100%; height: 8px; background-color: #e0e0e0; border-radius: 4px; margin-top: 6px; overflow: hidden; }
+        .barra-progresso-fill { height: 100%; width: 0%; transition: width 0.3s; }
+        
+        .painel-resultado-inferior {
+            margin-top: 25px;
+            background-color: #f1f3f4;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px dashed #ccc;
+            min-height: 100px;
+        }
+
+        .resultado-conteudo { display: flex; align-items: center; gap: 20px; text-align: left; }
+        .circulo-resultado { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #ccc; display: none; flex-shrink: 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .nome-cor { font-size: 15px; font-weight: bold; color: #333; line-height: 1.4; }
+
+        .botoes-container { width: 250px; }
+        .action-btn { color: white; border: none; padding: 14px 20px; font-size: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #btn-revelar { background-color: #28a745; }
+        #btn-revelar:hover { background-color: #218838; }
+        #btn-zerar { background-color: #dc3545; }
+        #btn-zerar:hover { background-color: #bd2130; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fase 3: Laboratório de Proporções Livres</h1>
+    <p>Insira as partes de cada cor. O sistema calcula a proporção real mesmo que a soma passe de 100%!</p>
+    
+    <div class="laboratorio-grid">
+        <div class="coluna">
+            <div class="titulo-coluna">🎨 Cores Primárias</div>
+            
+            <div class="bloco-input-cor">
+                <label class="label-instrucao" for="input-vermelho">Vermelho (Partes):</label>
+                <div class="campo-numerico-wrapper">
+                    <input type="number" id="input-vermelho" class="input-porcentagem" min="0" placeholder="0" oninput="atualizarFluxo()">
+                </div>
+                <div class="barra-progresso-bg"><div id="barra-vermelho" class="barra-progresso-fill" style="background-color: #ff0000;"></div></div>
+            </div>
+
+            <div class="bloco-input-cor">
+                <label class="label-instrucao" for="input-amarelo">Amarelo (Partes):</label>
+                <div class="campo-numerico-wrapper">
+                    <input type="number" id="input-amarelo" class="input-porcentagem" min="0" placeholder="0" oninput="atualizarFluxo()">
+                </div>
+                <div class="barra-progresso-bg"><div id="barra-amarelo" class="barra-progresso-fill" style="background-color: #ffcc00;"></div></div>
+            </div>
+
+            <div class="bloco-input-cor">
+                <label class="label-instrucao" for="input-azul">Azul (Partes):</label>
+                <div class="campo-numerico-wrapper">
+                    <input type="number" id="input-azul" class="input-porcentagem" min="0" placeholder="0" oninput="atualizarFluxo()">
+                </div>
+                <div class="barra-progresso-bg"><div id="barra-azul" class="barra-progresso-fill" style="background-color: #0055ff;"></div></div>
+            </div>
+        </div>
+
+        <div class="coluna">
+            <div class="titulo-coluna">🧪 Cores Secundárias</div>
+            
+            <div class="bloco-input-cor">
+                <label class="label-instrucao" for="input-laranja">Laranja (Partes):</label>
+                <div class="campo-numerico-wrapper">
+                    <input type="number" id="input-laranja" class="input-porcentagem" min="0" placeholder="0" oninput="atualizarFluxo()">
+                </div>
+                <div class="barra-progresso-bg"><div id="barra-laranja" class="barra-progresso-fill" style="background-color: #ff6600;"></div></div>
+            </div>
+
+            <div class="bloco-input-cor">
+                <label class="label-instrucao" for="input-verde">Verde (Partes):</label>
+                <div class="campo-numerico-wrapper">
+                    <input type="number" id="input-verde" class="input-porcentagem" min="0" placeholder="0" oninput="atualizarFluxo()">
+                </div>
+                <div class="barra-progresso-bg"><div id="barra-verde" class="barra-progresso-fill" style="background-color: #009900;"></div></div>
+            </div>
+
+            <div class="bloco-input-cor">
+                <label class="label-instrucao" for="input-roxo">Roxo (Partes):</label>
+                <div class="campo-numerico-wrapper">
+                    <input type="number" id="input-roxo" class="input-porcentagem" min="0" placeholder="0" oninput="atualizarFluxo()">
+                </div>
+                <div class="barra-progresso-bg"><div id="barra-roxo" class="barra-progresso-fill" style="background-color: #660099;"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="painel-resultado-inferior">
+        <div class="resultado-conteudo">
+            <div id="circulo" class="circulo-resultado"></div>
+            <div id="nome" class="nome-cor">Coloque os valores numéricos para dosar os pigmentos...</div>
+        </div>
+        
+        <div class="botoes-container">
+            <button class="action-btn" id="btn-revelar" style="display:none;" onclick="revelar()">Diga a resposta e Revelar</button>
+            <button class="action-btn" id="btn-zerar" onclick="zerarTudo()">Zerar Próximo Teste</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const idsCores = ['vermelho', 'amarelo', 'azul', 'laranja', 'verde', 'roxo'];
+
+    function atualizarFluxo() {
+        let preenchidos = 0;
+        let somaTotalInputs = 0;
+
+        // Calcula a soma total digitada primeiro para recalcular o preenchimento das barras
+        idsCores.forEach(cor => {
+            let input = document.getElementById(`input-${cor}`);
+            let valor = parseInt(input.value) || 0;
+            if (valor < 0) { valor = 0; input.value = 0; }
+            somaTotalInputs += valor;
+            if (valor > 0) preenchidos++;
+        });
+
+        // Atualiza o tamanho visual das barras baseado na proporção real do total
+        idsCores.forEach(cor => {
+            let valor = parseInt(document.getElementById(`input-${cor}`).value) || 0;
+            let porcentagemVisual = somaTotalInputs > 0 ? (valor / somaTotalInputs) * 100 : 0;
+            document.getElementById(`barra-${cor}`).style.width = porcentagemVisual + '%';
+        });
+
+        const btnRevelar = document.getElementById('btn-revelar');
+        const btnZerar = document.getElementById('btn-zerar');
+        if (preenchidos >= 1) {
+            btnRevelar.style.display = 'block';
+            btnZerar.style.display = 'none';
+        } else {
+            btnRevelar.style.display = 'none';
+            btnZerar.style.display = 'block';
+        }
+    }
+
+    function revelar() {
+        const circulo = document.getElementById('circulo');
+        const nome = document.getElementById('nome');
+        circulo.style.display = 'block';
+
+        let v = parseInt(document.getElementById('input-vermelho').value) || 0;
+        let am = parseInt(document.getElementById('input-amarelo').value) || 0;
+        let az = parseInt(document.getElementById('input-azul').value) || 0;
+        let la = parseInt(document.getElementById('input-laranja').value) || 0;
+        let ve = parseInt(document.getElementById('input-verde').value) || 0;
+        let ro = parseInt(document.getElementById('input-roxo').value) || 0;
+
+        let totalSoma = v + am + az + la + ve + ro;
+
+        if (totalSoma === 0) {
+            circulo.style.display = 'none';
+            nome.innerText = 'Insira valores para misturar.';
+            return;
+        }
+
+        // Converte as quantidades em frações e divide as secundárias em suas primárias constituintes
+        let vTotal = v + (la * 0.5) + (ro * 0.5);
+        let amTotal = am + (la * 0.5) + (ve * 0.5);
+        let azTotal = az + (ve * 0.5) + (ro * 0.5);
+        
+        let somaSubstancial = vTotal + amTotal + azTotal;
+
+        // Proporções exatas de cada canal de cor pura (0.0 a 1.0)
+        let propV = vTotal / somaSubstancial;
+        let propAm = amTotal / somaSubstancial;
+        let propAz = azTotal / somaSubstancial;
+
+        // Transforma as proporções em RGB pigmentar
+        let r = Math.round((255 * propV) + (255 * propAm) + (0 * propAz));
+        let g = Math.round((0 * propV)   + (215 * propAm) + (75 * propAz));
+        let b = Math.round((0 * propV)   + (0 * propAm)   + (255 * propAz));
+
+        // Descobre o nível de equilíbrio neutro (menor carga presente entre as três primárias)
+        let menorCarga = Math.min(propV, propAm, propAz);
+
+        // Se houver presença equilibrada das três primárias (ex: 33/33/33 ou misturas que neutralizam), escurece tendendo ao preto
+        // Multiplicamos por 3 porque o valor máximo teórico de menorCarga em um equilíbrio perfeito é 0.333
+        let fatorPreto = menorCarga * 3; 
+        let fatorColorido = 1 - (fatorPreto * 0.95); // 0.95 garante que mantenha um tom super escuro sem sumir totalmente
+
+        r = Math.round(r * fatorColorido);
+        g = Math.round(g * fatorColorido);
+        b = Math.round(b * fatorColorido);
+
+        // Limite mínimo de visualização para manter a elegância estética do círculo
+        if (r < 15) r = 15;
+        if (g < 15) g = 15;
+        if (b < 15) b = 15;
+
+        circulo.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+        // Definição inteligente do texto descritivo
+        let textoFinal = "TOM CUSTOMIZADO";
+        let percentvReal = Math.round(propV * 100);
+        let percentamReal = Math.round(propAm * 100);
+        let percentazReal = Math.round(propAz * 100);
+
+        if (r === 15 && g === 15 && b === 15) {
+            textoFinal = "PRETO CROMÁTICO (Absorção Total de Luz)";
+        } else if (menorCarga > 0.2) {
+            textoFinal = "TOM ESCURO E NEUTRO (Presença forte das 3 primárias)";
+        } else {
+            if (propV > propAm && propV > propAz) {
+                textoFinal = propAz > 0.1 ? "ROXO / VINHO" : "VARIAÇÃO DE LARANJA ESCURO / TERRA";
+            } else if (propAm > propV && propAm > propAz) {
+                textoFinal = "VARIAÇÃO DE VERDE FOLHA / CLARO";
+            } else if (propAz > propV && propAz > propAm) {
+                textoFinal = "VARIAÇÃO DE AZUL FECHADO / TURQUESA";
+            }
+        }
+
+        nome.innerHTML = `Distribuição Real da Mistura:<br>🔴 Vermelho: ${percentvReal}% | 🟡 Amarelo: ${percentamReal}% | 🔵 Azul: ${percentazReal}%<br><strong>Resultado: ${textoFinal}</strong>`;
+
+        document.getElementById('btn-revelar').style.display = 'none';
+        document.getElementById('btn-zerar').style.display = 'block';
+    }
+
+    function zerarTudo() {
+        idsCores.forEach(cor => {
+            document.getElementById(`input-${cor}`).value = '';
+            document.getElementById(`barra-${cor}`).style.width = '0%';
+        });
+        document.getElementById('btn-revelar').style.display = 'none';
+        document.getElementById('btn-zerar').style.display = 'block';
+        document.getElementById('circulo').style.display = 'none';
+        document.getElementById('nome').innerText = 'Coloque os valores numéricos para dosar os pigmentos...';
+    }
+</script>
+</body>
+</html>

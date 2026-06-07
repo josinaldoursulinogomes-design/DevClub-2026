@@ -1,0 +1,48 @@
+<!--Formas.html
+    Captudar dados de entrada
+    Input -> Entrada
+
+    Action -> Define a URL para onde os dados do formulário serão enviados quando o usuário clicar 
+    no botão de envio.
+    Method -> Especifica o método HTTP a ser usado ao enviar os dados do formulário. Os métodos mais
+    comuns são "GET" e "POST".
+
+    Em FORM  ou FOMULÁRIO TEM DUAS COISAS IMPORTANTES QUE NÃO PODE FALTAR
+    O INPUT E UM BOTÃO DE ENVIO.
+
+    MÉTOD GET: os dados do formulário são anexados à URL como parâmetros de consulta.
+    Isso é útil para formulários simples, mas não é recomendado para enviar informações
+    sensíveis, pois os dados ficam visíveis na URL.
+    
+    MÉTODO POST: os dados do formulário são enviados no corpo da solicitação HTTP, o
+    que é mais seguro para informações sensíveis. É recomendado para a maioria dos formulários,
+    especialmente aqueles que envolvem login, cadastro ou envio de dados pessoais.
+-->
+
+<form action="" method="post">
+        <h1>digite o endereço</h1>
+    <label>
+        Rua:
+    <input type="text" name="Rua" autocomplete="street-address"/>
+     </label>
+
+    <label>
+        Numero:
+    <input type="number" name="Numero" autocomplete="address-level2"/>
+     </label>
+
+     <label>
+        Telefone:
+    <input type="tel" name="Telefone" autocomplete="tel"/>
+     </label>
+
+     <label>
+        Próximo a:
+    <input type="text" name="Próximo a" autocomplete="address-level2"/>
+     </label>
+
+<br><br>
+    <button type="submit" >Enviar Dados</button> <!-- você pode ter 4 tipos de botões no vs code (button, menu, reset, submit)-->
+    
+</form>
+     

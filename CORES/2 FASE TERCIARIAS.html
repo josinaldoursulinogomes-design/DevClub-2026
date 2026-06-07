@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 2 - Cores Terciárias</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
+        .container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        
+        /* Estrutura de linha padrão */
+        .linha-fase {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafafa;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            min-height: 110px;
+        }
+
+        /* Grupo dos botões redondos */
+        .grupo-cores {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .btn-cor { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; margin: 10px; font-weight: bold; color: white; text-shadow: 1px 1px 2px #000; transition: transform 0.2s; vertical-align: middle; }
+        .btn-cor:hover { transform: scale(1.1); }
+        .btn-cor.selecionado { border: 4px solid #333; transform: scale(1.05); box-shadow: 0 0 8px rgba(0,0,0,0.5); }
+        
+        /* Coluna da Direita (Área de Interação Dinâmica) */
+        .coluna-direita {
+            width: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-left: 20px;
+            border-left: 2px dashed #eee;
+        }
+
+        /* Botões de Ação (Linha das Primárias) */
+        .action-btn { color: white; border: none; padding: 14px 20px; font-size: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #btn-revelar { background-color: #28a745; }
+        #btn-revelar:hover { background-color: #218838; }
+        #btn-zerar { background-color: #dc3545; }
+        #btn-zerar:hover { background-color: #bd2130; }
+
+        /* Painel de Resultado (Linha das Secundárias) */
+        .resultado-conteudo { display: flex; align-items: center; gap: 15px; text-align: left; width: 100%; justify-content: flex-start; }
+        .circulo-resultado { width: 75px; height: 75px; border-radius: 50%; border: 2px solid #ccc; display: none; flex-shrink: 0; }
+        .nome-cor { font-size: 16px; font-weight: bold; color: #333; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fase 2: Cores Terciárias</h1>
+    <p>Selecione uma cor Primária e uma Secundária. Use os comandos no painel superior direito e veja o resultado abaixo!</p>
+    
+    <div class="linha-fase">
+        <div class="grupo-cores">
+            <small style="font-weight: bold; color: #555; display: block; margin-left: 10px;">1. Escolha uma Primária:</small>
+            <button id="p-vermelho" class="btn-cor" style="background-color: #ff0000;" onclick="selecionar('p', this, 'vermelho', 'Vermelho')">Vermelho</button>
+            <button id="p-amarelo" class="btn-cor" style="background-color: #ffcc00; color: black; text-shadow: none;" onclick="selecionar('p', this, 'amarelo', 'Amarelo')">Amarelo</button>
+            <button id="p-azul" class="btn-cor" style="background-color: #0000ff;" onclick="selecionar('p', this, 'azul', 'Azul')">Azul</button>
+        </div>
+        
+        <div class="coluna-direita">
+            <button class="action-btn" id="btn-revelar" style="display:none;" onclick="revelar()">Diga a resposta e Revelar</button>
+            <button class="action-btn" id="btn-zerar" onclick="zerarTudo()">Zerar Próximo Teste</button>
+        </div>
+    </div>
+
+    <div class="linha-fase">
+        <div class="grupo-cores">
+            <small style="font-weight: bold; color: #555; display: block; margin-left: 10px;">2. Escolha uma Secundária:</small>
+            <button id="s-laranja" class="btn-cor" style="background-color: #ff6600;" onclick="selecionar('s', this, 'laranja', 'Laranja')">Laranja</button>
+            <button id="s-verde" class="btn-cor" style="background-color: #009900;" onclick="selecionar('s', this, 'verde', 'Verde')">Verde</button>
+            <button id="s-roxo" class="btn-cor" style="background-color: #660099;" onclick="selecionar('s', this, 'roxo', 'Roxo')">Roxo</button>
+        </div>
+        
+        <div class="coluna-direita" style="background-color: #f1f3f4; border-radius: 6px;">
+            <div class="resultado-conteudo">
+                <div id="circulo" class="circulo-resultado"></div>
+                <div id="nome" class="nome-cor"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let primaria = '';
+    let secundaria = '';
+
+    const nomesOriginais = {
+        'vermelho': 'Vermelho', 'amarelo': 'Amarelo', 'azul': 'Azul',
+        'laranja': 'Laranja', 'verde': 'Verde', 'roxo': 'Roxo'
+    };
+
+    function selecionar(tipo, btn, cor, nomeOriginal) {
+        if (btn.classList.contains('selecionado')) {
+            btn.classList.remove('selecionado');
+            btn.innerText = nomeOriginal;
+            if (tipo === 'p') primaria = '';
+            if (tipo === 's') secundaria = '';
+        } else {
+            const botoesSecao = btn.parentNode.querySelectorAll('.btn-cor');
+            botoesSecao.forEach(b => {
+                b.classList.remove('selecionado');
+                const corId = b.id.split('-')[1];
+                b.innerText = nomesOriginais[corId];
+            });
+
+            btn.classList.add('selecionado');
+            btn.innerText = nomeOriginal + " ( ✓ )";
+            
+            if (tipo === 'p') primaria = cor;
+            if (tipo === 's') secundaria = cor;
+        }
+        
+        const btnRevelar = document.getElementById('btn-revelar');
+        const btnZerar = document.getElementById('btn-zerar');
+        
+        if (primaria && secundaria) {
+            btnRevelar.style.display = 'block';
+            btnZerar.style.display = 'none';
+        } else {
+            btnRevelar.style.display = 'none';
+            btnZerar.style.display = 'block';
+        }
+    }
+
+    function revelar() {
+        const circulo = document.getElementById('circulo');
+        const nome = document.getElementById('nome');
+        circulo.style.display = 'block';
+        
+        const mistura = `${primaria}+${secundaria}`;
+        
+        const coresTerciarias = {
+            'vermelho+laranja': { hex: '#ff4500', nome: 'Vermelho-alaranjado' },
+            'amarelo+laranja': { hex: '#ffaa00', nome: 'Amarelo-alaranjado' },
+            'amarelo+verde': { hex: '#99cc00', nome: 'Amarelo-esverdeado (Verde-limão)' },
+            'azul+verde': { hex: '#00a896', nome: 'Azul-esverdeado (Turquesa)' },
+            'azul+roxo': { hex: '#4b0082', nome: 'Azul-arroxeado (Índigo)' },
+            'vermelho+roxo': { hex: '#c71585', nome: 'Vermelho-arroxeado (Magenta)' }
+        };
+
+        if (coresTerciarias[mistura]) {
+            circulo.style.backgroundColor = coresTerciarias[mistura].hex;
+            nome.innerText = coresTerciarias[mistura].nome.toUpperCase();
+        } else {
+            circulo.style.backgroundColor = '#7a5842';
+            nome.innerText = 'MARROM / NEUTRO\n(Cores Opostas)';
+        }
+
+        document.getElementById('btn-revelar').style.display = 'none';
+        document.getElementById('btn-zerar').style.display = 'block';
+    }
+
+    function zerarTudo() {
+        primaria = '';
+        secundaria = '';
+        
+        document.getElementById('btn-revelar').style.display = 'none';
+        document.getElementById('btn-zerar').style.display = 'block';
+        document.getElementById('circulo').style.display = 'none';
+        document.getElementById('nome').innerText = '';
+        
+        const todosBotoes = document.querySelectorAll('.btn-cor');
+        todosBotoes.forEach(b => {
+            b.classList.remove('selecionado');
+            const corId = b.id.split('-')[1];
+            b.innerText = nomesOriginais[corId];
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!-- INPUT -->
+<!-- 
+1. Inputs são caixas de texto usadas no preenchimento de formulários 
+
+2. O atributo autoComplete é usado para sugerir opções de preenchimento
+automático com base no tipo de informação solicitada (ex: endereço, email, etc.)
+
+3. O atributo placeholder exibe um texto de exemplo dentro do campo de entrada,
+indicando o tipo de informação esperada.
+
+4. O atributo disabled desativa o campo de entrada, impedindo que o usuário interaja com ele.
+
+5. O atributo readOnly torna o campo de entrada somente leitura, permitindo que o usuário veja 
+o conteúdo, mas não possa editá-lo.
+
+6. O atributo autofocus faz com que o campo de entrada receba foco automaticamente quando a página
+é carregada, permitindo que o usuário comece a digitar imediatamente.
+
+7. O atributo for em um elemento <label> associa o rótulo a um elemento de formulário específico,
+melhorando a acessibilidade e a usabilidade do formulário. O valor do atributo for deve corresponder
+ao id do elemento de formulário que ele está rotulando.
+
+8. O atributo id é usado para identificar de forma única um elemento HTML, permitindo que ele seja
+referenciado por outros elementos, como rótulos ou scripts. No contexto de formulários,
+o atributo id é frequentemente usado para associar um rótulo a um campo de entrada, melhorando a
+acessibilidade e a usabilidade do formulário.
+
+-->
+
+<label>
+
+    Meu nome:
+    <input
+    autoComplete="street-address"
+    placeholder="Digite seu endereço"
+    value="Josinaldo Ursulino Gomes, 0"
+/>
+</label>
+
+
+<label for="Nome de Usuario">Nome de Usuario</label>
+<input id="Nome de Usuario"autofocus/>
+
+
+
+<!--
+<input
+    autoComplete="street-address"
+    placeholder="Digite seu endereço"
+    disabled
+    />
+
+
+<input
+autoComplete="postal-code"
+value="aprendiz de programação"
+readOnly
+/>
+
+-->

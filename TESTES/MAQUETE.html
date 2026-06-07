@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle - Maquete de Placa-Mãe</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d1117;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Barra Lateral para a Legenda (Fora do ambiente da placa) */
+        .sidebar-legenda {
+            width: 320px;
+            background-color: #161b22;
+            border-right: 2px solid #22c55e;
+            padding: 30px 20px;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .sidebar-legenda h2 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: #22c55e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-legenda p {
+            margin: 0 0 25px 0;
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .grupo-legendas {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .item-legenda {
+            background: #21262d;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .item-topo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .item-topo span {
+            font-size: 18px;
+            margin-right: 10px;
+            line-height: 1;
+        }
+
+        .item-desc {
+            font-size: 11px;
+            color: #8b949e;
+            padding-left: 20px;
+            line-height: 1.4;
+        }
+
+        /* Área do Simulador (Placa-Mãe) */
+        .area-simulador {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0d1117;
+            position: relative;
+        }
+
+        #canvas-container {
+            box-shadow: 0 0 50px rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        canvas {
+            display: block;
+            background: #155e39; /* Verde guache */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-legenda">
+        <h2>Telemetria Externa</h2>
+        <p>Mapeamento de componentes da maquete física</p>
+        
+        <div class="grupo-legendas">
+            <div class="item-legenda">
+                <div class="item-topo"><span style="color: #eab308;">●</span> Memória</div>
+                <div class="item-desc">Representada pelos 4 slots amarelos compridos na lateral esquerda da maquete.</div>
+            </div>
+            
+            <div class="item-legenda">
+                <div class="item-topo"><span style="color: #ca8a04;">●</span> Cooler</div>
+                <div class="item-desc">O grande círculo de papelão ondulado com aletas em espiral no topo direito.</div>
+            </div>
+
+            <div class="item-legenda">
+                <div class="item-topo"><span style="color: #2563eb;">●</span> Chipset</div>
+                <div class="item-desc">O quadrado azul médio centralizado que gerencia o fluxo de dados dos periféricos.</div>
+            </div>
+
+            <div class="item-legenda">
+                <div class="item-topo"><span style="color: #67e8f9;">●</span> Processador</div>
+                <div class="item-desc">O núcleo central de processamento de instruções, posicionado logo abaixo do cooler protetor.</div>
+            </div>
+
+            <div class="item-legenda">
+                <div class="item-topo"><span style="color: #fef08a;">●</span> Barramentos</div>
+                <div class="item-desc">Palitos de madeira e fluxos de elétrons luminosos que interligam os componentes.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="area-simulador">
+        <div id="canvas-container">
+            <canvas id="maqueteCanvas" width="700" height="800"></canvas>
+        </div>
+    </div>
+
+<script>
+const canvas = document.getElementById('maqueteCanvas');
+const ctx = canvas.getContext('2d');
+
+// --- MAPEAMENTO DOS COMPONENTES BASEADO NA FOTO ---
+const componentes = [
+    // 4 Slots de RAM Amarelos (Memória)
+    { tipo: "ram", x: 60, y: 160, w: 25, h: 280, cor: "#eab308" },
+    { tipo: "ram", x: 95, y: 160, w: 25, h: 280, cor: "#eab308" },
+    { tipo: "ram", x: 130, y: 160, w: 25, h: 280, cor: "#eab308" },
+    { tipo: "ram", x: 165, y: 160, w: 25, h: 280, cor: "#eab308" },
+
+    // Fileira de VRM Laranja
+    { tipo: "vrm", x: 310, y: 160, w: 20, h: 260, cor: "#f97316" },
+
+    // Cooler de Papelão (Círculo) que protege o Processador
+    { tipo: "cpu", x: 500, y: 170, r: 110, cor: "#ca8a04" },
+
+    // Chipset Quadrado Azul
+    { tipo: "chipset", x: 470, y: 450, w: 180, h: 160, cor: "#2563eb" },
+
+    // Conector/Slot Vermelho Inferior
+    { tipo: "slot_red", x: 340, y: 620, w: 160, h: 70, cor: "#dc2626" },
+
+    // Bloco Ondulado Rosa
+    { tipo: "rosa", x: 240, y: 480, w: 45, h: 120, cor: "#ec4899" }
+];
+
+// --- TRILHAS E BARRAMENTOS ADAPTADOS ---
+const trilhas = [
+    // Do VRM Laranja alimentando o Processador
+    { pontos: [{x: 330, y: 220}, {x: 390, y: 220}], pulsoPos: 0, vel: 2 },
+    { pontos: [{x: 330, y: 300}, {x: 390, y: 300}], pulsoPos: 0, vel: 2 },
+    
+    // Barramentos de Dados: Memória <-> Processador (Tráfego pelos palitos centrais)
+    { pontos: [{x: 190, y: 200}, {x: 390, y: 200}], pulsoPos: 0, vel: 2.5 },
+    { pontos: [{x: 390, y: 260}, {x: 190, y: 260}], pulsoPos: 0, vel: 2.5 }, // Leitura (Inverso)
+    { pontos: [{x: 190, y: 320}, {x: 390, y: 320}], pulsoPos: 0, vel: 2.5 },
+
+    // Processador conversando com o Chipset Azul
+    { pontos: [{x: 500, y: 280}, {x: 500, y: 450}], pulsoPos: 0, vel: 1.8 },
+    { pontos: [{x: 540, y: 450}, {x: 540, y: 280}], pulsoPos: 0, vel: 1.8 },
+
+    // Chipset controlando blocos periféricos (Rosa e Vermelho)
+    { pontos: [{x: 470, y: 540}, {x: 285, y: 540}], pulsoPos: 0, vel: 1.5 },
+    { pontos: [{x: 470, y: 590}, {x: 420, y: 590}, {x: 420, y: 620}], pulsoPos: 0, vel: 1.5 }
+];
+
+function obterPontoNaTrilha(pontos, t) {
+    if (pontos.length < 2) return null;
+    let p1 = pontos[0];
+    let p2 = pontos[1];
+    if(pontos.length === 3) {
+        if(t < 0.5) {
+            p1 = pontos[0]; p2 = pontos[1]; t *= 2;
+        } else {
+            p1 = pontos[1]; p2 = pontos[2]; t = (t - 0.5) * 2;
+        }
+    }
+    return { x: p1.x + t * (p2.x - p1.x), y: p1.y + t * (p2.y - p1.y) };
+}
+
+function desenharPlacaMaquete() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Fundo Verde Guache
+    ctx.fillStyle = "#155e39";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Ranhuras da pincelada
+    ctx.strokeStyle = "#166534";
+    ctx.lineWidth = 3;
+    for(let i=0; i<canvas.height; i+=30) {
+        ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i + 15); ctx.stroke();
+    }
+
+    // Palitos físicos (Barramentos passivos de fundo)
+    trilhas.forEach(t => {
+        ctx.strokeStyle = "rgba(254, 240, 138, 0.15)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(t.pontos[0].x, t.pontos[0].y);
+        for(let i=1; i<t.pontos.length; i++) ctx.lineTo(t.pontos[i].x, t.pontos[i].y);
+        ctx.stroke();
+    });
+
+    // Renderização dos Componentes
+    componentes.forEach(comp => {
+        ctx.save();
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "rgba(0,0,0,0.6)";
+
+        if (comp.tipo === "ram") {
+            ctx.fillStyle = comp.cor;
+            ctx.fillRect(comp.x, comp.y, comp.w, comp.h);
+            ctx.fillStyle = "#fef08a";
+            ctx.fillRect(comp.x + 10, comp.y + 10, 5, comp.h - 20);
+        } 
+        else if (comp.tipo === "vrm") {
+            ctx.fillStyle = comp.cor;
+            for(let py = comp.y; py < comp.y + comp.h; py += 25) {
+                ctx.fillRect(comp.x, py, comp.w, 16);
+            }
+        } 
+        else if (comp.tipo === "cpu") {
+            ctx.strokeStyle = comp.cor;
+            ctx.lineWidth = 8;
+            ctx.fillStyle = "#a16207";
+            ctx.beginPath(); ctx.arc(comp.x, comp.y, comp.r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            
+            ctx.strokeStyle = "#78350f";
+            ctx.lineWidth = 3;
+            for(let rInt = 25; rInt < comp.r; rInt += 25) {
+                ctx.beginPath();
+                ctx.arc(comp.x, comp.y, rInt, 0, Math.PI * 1.6);
+                ctx.stroke();
+            }
+            ctx.fillStyle = "#fef08a";
+            ctx.beginPath(); ctx.arc(comp.x, comp.y, 6, 0, Math.PI*2); ctx.fill();
+        } 
+        else {
+            ctx.fillStyle = comp.cor;
+            ctx.fillRect(comp.x, comp.y, comp.w, comp.h);
+            ctx.strokeStyle = "rgba(255,255,255,0.15)";
+            ctx.strokeRect(comp.x, comp.y, comp.w, comp.h);
+        }
+        ctx.restore();
+    });
+}
+
+function processarAnimacao() {
+    desenharPlacaMaquete();
+
+    // Elétrons ativos (Barramentos lógicos móveis)
+    trilhas.forEach(t => {
+        t.pulsoPos += (t.vel / 220);
+        if (t.pulsoPos > 1) t.pulsoPos = 0;
+
+        let pos = obterPontoNaTrilha(t.pontos, t.pulsoPos);
+        if (pos) {
+            ctx.save();
+            ctx.shadowBlur = 18;
+            ctx.shadowColor = "#67e8f9";
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath(); ctx.arc(pos.x, pos.y, 4.5, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+        }
+    });
+
+    requestAnimationFrame(processarAnimacao);
+}
+
+processarAnimacao();
+</script>
+
+</body>
+</html>

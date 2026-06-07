@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fase 1 - Cores Primárias</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .btn-cor { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; margin: 15px; font-weight: bold; color: white; text-shadow: 1px 1px 2px #000; transition: transform 0.2s; }
+        .btn-cor:hover { transform: scale(1.1); }
+        .btn-cor.selecionado { border: 4px solid #333; transform: scale(1.05); box-shadow: 0 0 8px rgba(0,0,0,0.5); }
+        .resultado-box { margin-top: 30px; display: flex; flex-direction: column; align-items: center; min-height: 160px; }
+        .circulo-resultado { width: 120px; height: 120px; border-radius: 50%; border: 2px solid #ccc; margin-bottom: 15px; display: none; }
+        .nome-cor { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 15px; }
+        
+        /* Layout dos botões de comando lado a lado */
+        .botoes-container { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        .action-btn { color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #btn-revelar { background-color: #28a745; }
+        #btn-revelar:hover { background-color: #218838; }
+        #btn-zerar { background-color: #dc3545; }
+        #btn-zerar:hover { background-color: #bd2130; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Fase 1: Misturando Cores Primárias</h1>
+    <p>Escolha duas ou três cores primárias, adivinhe o resultado com seu colega e depois clique em revelar!</p>
+    
+    <button id="btn-azul" class="btn-cor" style="background-color: #0000ff;" onclick="selecionar(this, 'azul', 'Azul')">Azul</button>
+    <button id="btn-amarelo" class="btn-cor" style="background-color: #ffcc00; color: black; text-shadow: none;" onclick="selecionar(this, 'amarelo', 'Amarelo')">Amarelo</button>
+    <button id="btn-vermelho" class="btn-cor" style="background-color: #ff0000;" onclick="selecionar(this, 'vermelho', 'Vermelho')">Vermelho</button>
+    
+    <div class="resultado-box">
+        <div class="botoes-container">
+            <button class="action-btn" id="btn-revelar" style="display:none;" onclick="revelar()">Diga a resposta e clique para Revelar</button>
+            <!-- Botão de comando Zerar sempre visível para reiniciar -->
+            <button class="action-btn" id="btn-zerar" onclick="zerarTudo()">Zerar para o Próximo Teste</button>
+        </div>
+        
+        <div id="circulo" class="circulo-resultado"></div>
+        <div id="nome" class="nome-cor"></div>
+    </div>
+</div>
+
+<script>
+    let escolhas = [];
+    
+    function selecionar(btn, cor, nomeOriginal) {
+        if (btn.classList.contains('selecionado')) {
+            btn.classList.remove('selecionado');
+            btn.innerText = nomeOriginal;
+            escolhas = escolhas.filter(item => item !== cor);
+        } else {
+            btn.classList.add('selecionado');
+            btn.innerText = nomeOriginal + " ( ✓ )";
+            escolhas.push(cor);
+        }
+        
+        const btnRevelar = document.getElementById('btn-revelar');
+        if (escolhas.length >= 2) {
+            btnRevelar.style.display = 'block';
+        } else {
+            btnRevelar.style.display = 'none';
+        }
+    }
+
+    function revelar() {
+        const circulo = document.getElementById('circulo');
+        const nome = document.getElementById('nome');
+        circulo.style.display = 'block';
+        
+        const mistura = escolhas.sort().join('+');
+        
+        if (mistura === 'amarelo+azul') {
+            circulo.style.backgroundColor = '#009900';
+            nome.innerText = 'VERDE (Secundária)';
+        } else if (mistura === 'amarelo+vermelho') {
+            circulo.style.backgroundColor = '#ff6600';
+            nome.innerText = 'LARANJA (Secundária)';
+        } else if (mistura === 'azul+vermelho') {
+            circulo.style.backgroundColor = '#660099';
+            nome.innerText = 'ROXO / VIOLETA (Secundária)';
+        } else if (mistura === 'amarelo+azul+vermelho') {
+            circulo.style.backgroundColor = '#4a3b32';
+            nome.innerText = 'CASTANHO / MARROM ESCURO (União das 3 Primárias)';
+        }
+        
+        // Esconde o botão de revelar após o clique, mantendo os checks e o resultado na tela
+        document.getElementById('btn-revelar').style.display = 'none';
+    }
+
+    // Função manual que o usuário clica para limpar tudo de uma vez e começar de novo
+    function zerarTudo() {
+        escolhas = [];
+        
+        // Oculta o botão revelar e limpa o resultado visual
+        document.getElementById('btn-revelar').style.display = 'none';
+        document.getElementById('circulo').style.display = 'none';
+        document.getElementById('nome').innerText = '';
+        
+        // Reseta completamente os botões superiores
+        const azul = document.getElementById('btn-azul');
+        azul.classList.remove('selecionado');
+        azul.innerText = 'Azul';
+
+        const amarelo = document.getElementById('btn-amarelo');
+        amarelo.classList.remove('selecionado');
+        amarelo.innerText = 'Amarelo';
+
+        const vermelho = document.getElementById('btn-vermelho');
+        vermelho.classList.remove('selecionado');
+        vermelho.innerText = 'Vermelho';
+    }
+</script>
+</body>
+</html>

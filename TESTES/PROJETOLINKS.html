@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus link principais</title>
+    <style>
+        /* Configuração Geral da Página */
+        body {
+            background-color: #0d0d13;
+            /* Fundo preto/escuro digital */
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Título da Página */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #ff007f, #00f0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Logomarca de Programação em HTML (Ícone Estilizado </>) */
+        .logo-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo-html {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #e34c26;
+            /* Cor oficial do HTML5 */
+            text-shadow: 0 0 20px rgba(227, 76, 38, 0.5);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        /* Container dos Botões */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Estilização Base dos Botões */
+        .btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #1a1a24;
+            color: #ffffff;
+            border-radius: 8px;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Bordas Coloridas Personalizadas para cada Botão */
+        .btn-google {
+            border-color: #4285F4;
+            /* Azul Google */
+        }
+
+        .btn-google:hover {
+            background-color: #4285F4;
+            box-shadow: 0 0 20px rgba(66, 133, 244, 0.6);
+        }
+
+        .btn-facebook {
+            border-color: #1877F2;
+            /* Azul Facebook */
+        }
+
+        .btn-facebook:hover {
+            background-color: #1877F2;
+            box-shadow: 0 0 20px rgba(24, 119, 242, 0.6);
+        }
+
+        .btn-instagram {
+            border-color: #e1306c;
+            /* Rosa/Red Instagram */
+        }
+
+        .btn-instagram:hover {
+            background-color: #e1306c;
+            box-shadow: 0 0 20px rgba(225, 48, 108, 0.6);
+        }
+
+        .btn-uol {
+            border-color: #f58220;
+            /* Laranja UOL */
+        }
+
+        .btn-uol:hover {
+            background-color: #f58220;
+            box-shadow: 0 0 20px rgba(245, 130, 32, 0.6);
+        }
+
+        /* Novo Botão: DevClub (Borda Verde Code/Turquesa) */
+        .btn-devclub {
+            border-color: #00ff88;
+        }
+
+        .btn-devclub:hover {
+            background-color: #00ff88;
+            color: #0d0d13;
+            /* Muda o texto para escuro no hover para destacar */
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+        }
+
+        /* Efeito de clique rápido */
+        .btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h3 style="color: #ffd700; margin-top: 0;">By: Josinaldo Ursulino Gomes</h3>
+
+    <h1>Meus link principais</h1>
+
+    <div class="logo-container">
+        <div class="logo-html">&lt;/HTML&gt;</div>
+    </div>
+
+    <div class="button-container">
+        <a href="https://www.google.com" target="_blank" class="btn btn-google">GOOGLE</a>
+        <a href="https://www.facebook.com" target="_blank" class="btn btn-facebook">FACEBOOK</a>
+        <a href="https://www.instagram.com" target="_blank" class="btn btn-instagram">INSTAGRAN</a>
+        <a href="https://www.uol.com.br" target="_blank" class="btn btn-uol">UOL</a>
+        <a href="https://aulas.devclub.com.br/" target="_blank" class="btn btn-devclub">DEVCLUB</a>
+    </div>
+
+</body>
+
+</html>

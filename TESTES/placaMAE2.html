@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulação de Circuito de Placa-Mãe Realista</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0d1117;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            background: #06150f; /* Tom verde escuro de PCB */
+        }
+
+        .legenda {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            background: rgba(5, 15, 10, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 11px;
+            pointer-events: none;
+            border: 1px solid #00ff88;
+            max-width: 260px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .legenda h3 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .item-legenda {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container">
+    <div class="legenda">
+        <h3>Telemetria da Placa-Mãe</h3>
+        <div class="item-legenda"><span style="color: #ff3333;">●</span> <strong>Fonte ATX:</strong> Entrada de energia bruta.</div>
+        <div class="item-legenda"><span style="color: #ffaa00;">●</span> <strong>VRM (Fases):</strong> Filtragem e regulação de tensão.</div>
+        <div class="item-legenda"><span style="color: #00a2ff;">●</span> <strong>CPU:</strong> Processamento central e socket de pinos.</div>
+        <div class="item-legenda"><span style="color: #00ff88;">●</span> <strong>RAM:</strong> Barramentos bidirecionais (Leitura/Escrita).</div>
+        <div class="item-legenda"><span style="color: #9933ff;">●</span> <strong>Chipset:</strong> Ponte de controle de I/O.</div>
+        <div class="item-legenda"><span style="color: #00ffff;">●</span> <strong>Tela (Saída):</strong> Linha final de renderização.</div>
+    </div>
+    <canvas id="circuitCanvas" width="800" height="600"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('circuitCanvas');
+const ctx = canvas.getContext('2d');
+
+// Componentes da Placa-Mãe
+const componentes = [
+    { nome: "FONTE ATX", x: 40, y: 440, w: 130, h: 110, cor: "#ff3333", pinos: "direita" },
+    { nome: "VRM (Fases)", x: 310, y: 150, w: 70, h: 180, cor: "#ffaa00", detalhes: "capacitores" },
+    { nome: "CPU", x: 440, y: 160, w: 150, h: 150, cor: "#00a2ff", detalhes: "socket" },
+    { nome: "RAM", x: 680, y: 100, w: 35, h: 260, cor: "#00ff88", pinos: "esquerda" },
+    { nome: "CHIPSET", x: 500, y: 430, w: 100, h: 100, cor: "#9933ff", detalhes: "dissipador" },
+    { nome: "TELA (SAÍDA)", x: 660, y: 440, w: 100, h: 80, cor: "#00ffff" }
+];
+
+// Caminho dos Pulsos (Atualizado com fluxo bidirecional na RAM)
+const trilhas = [
+    // Da Fonte para o VRM
+    { pontos: [{x: 170, y: 480}, {x: 250, y: 480}, {x: 250, y: 240}, {x: 310, y: 240}], pulsoPos: 0, velocidade: 1.5 },
+    // Da Fonte para o Chipset
+    { pontos: [{x: 170, y: 520}, {x: 500, y: 520}], pulsoPos: 0, velocidade: 1.2 },
+    // Do VRM para a CPU (Alimentação Principal)
+    { pontos: [{x: 380, y: 190}, {x: 440, y: 190}], pulsoPos: 0, velocidade: 2 },
+    { pontos: [{x: 380, y: 235}, {x: 440, y: 235}], pulsoPos: 0, velocidade: 2 },
+    { pontos: [{x: 380, y: 280}, {x: 440, y: 280}], pulsoPos: 0, velocidade: 2 },
+    
+    // --- BARRAMENTO DA RAM CORRIGIDO (BIDIRECIONAL) ---
+    // Linha 1: CPU para RAM (Escrita de Dados)
+    { pontos: [{x: 590, y: 180}, {x: 680, y: 180}], pulsoPos: 0, velocidade: 2.5 },
+    // Linha 2: RAM para CPU (Leitura de Dados - Sentido Inverso!)
+    { pontos: [{x: 680, y: 220}, {x: 640, y: 220}, {x: 640, y: 250}, {x: 590, y: 250}], pulsoPos: 0, velocidade: 2.5 },
+    // Linha 3: CPU para RAM (Escrita de Dados)
+    { pontos: [{x: 590, y: 290}, {x: 680, y: 290}], pulsoPos: 0, velocidade: 2.5 },
+    
+    // Do Chipset para a CPU
+    { pontos: [{x: 520, y: 430}, {x: 520, y: 310}], pulsoPos: 0, velocidade: 1.8 },
+    // Trilhas de vídeo (Saída para a Tela)
+    { pontos: [{x: 590, y: 260}, {x: 630, y: 260}, {x: 630, y: 460}, {x: 660, y: 460}], pulsoPos: 0, velocidade: 3, tipo: "video" },
+    { pontos: [{x: 560, y: 430}, {x: 560, y: 390}, {x: 690, y: 390}, {x: 690, y: 440}], pulsoPos: 0, velocidade: 2.2, tipo: "video" }
+];
+
+// Cálculo de interpolação linear para trajetórias em curvas
+function obterPontoNaTrilha(pontos, t) {
+    if (pontos.length < 2) return null;
+    let comprimentos = [];
+    let comprimentoTotal = 0;
+    
+    for (let i = 0; i < pontos.length - 1; i++) {
+        let dx = pontos[i+1].x - pontos[i].x;
+        let dy = pontos[i+1].y - pontos[i].y;
+        let dist = Math.sqrt(dx*dx + dy*dy);
+        comprimentos.push(dist);
+        comprimentoTotal += dist;
+    }
+    
+    let distanciaAlvo = t * comprimentoTotal;
+    let somaDistancia = 0;
+    
+    for (let i = 0; i < comprimentos.length; i++) {
+        if (somaDistancia + comprimentos[i] >= distanciaAlvo) {
+            let localT = (distanciaAlvo - somaDistancia) / comprimentos[i];
+            let p1 = pontos[i];
+            let p2 = pontos[i+1];
+            return { x: p1.x + localT * (p2.x - p1.x), y: p1.y + localT * (p2.y - p1.y) };
+        }
+        somaDistancia += comprimentos[i];
+    }
+    return pontos[pontos.length - 1];
+}
+
+function desenharPlaca() {
+    // 1. Fundo e Malha de Fibra de Vidro da PCB
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgba(0, 70, 40, 0.2)";
+    ctx.lineWidth = 1.5;
+    for (let i = -200; i < canvas.width; i += 30) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i + 200, canvas.height);
+        ctx.stroke();
+    }
+
+    // Barramentos decorativos paralelos de dados entre CPU e RAM
+    ctx.strokeStyle = "rgba(184, 134, 11, 0.08)";
+    ctx.lineWidth = 1;
+    for (let barramentoY = 110; barramentoY < 350; barramentoY += 8) {
+        ctx.beginPath(); 
+        ctx.moveTo(590, barramentoY); 
+        ctx.lineTo(680, barramentoY); 
+        ctx.stroke();
+    }
+
+    // 2. Renderização das Trilhas de Energia/Dados Ativas
+    trilhas.forEach(trilha => {
+        ctx.strokeStyle = trilha.tipo === "video" ? "rgba(0, 255, 255, 0.25)" : "rgba(0, 255, 136, 0.2)";
+        ctx.lineWidth = trilha.tipo === "video" ? 3 : 2;
+        ctx.beginPath();
+        ctx.moveTo(trilha.pontos[0].x, trilha.pontos[0].y);
+        for (let i = 1; i < trilha.pontos.length; i++) {
+            ctx.lineTo(trilha.pontos[i].x, trilha.pontos[i].y);
+        }
+        ctx.stroke();
+
+        // Pontos de Solda (Pads) nas extremidades e quinas
+        trilha.pontos.forEach(p => {
+            ctx.fillStyle = "rgba(200, 200, 200, 0.4)";
+            ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI*2); ctx.fill();
+        });
+    });
+
+    // 3. Desenho dos Componentes da Placa
+    componentes.forEach(comp => {
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = comp.cor;
+
+        // Corpo do Chip
+        ctx.fillStyle = "#111827";
+        ctx.fillRect(comp.x, comp.y, comp.w, comp.h);
+        
+        ctx.strokeStyle = comp.cor;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(comp.x, comp.y, comp.w, comp.h);
+        ctx.shadowBlur = 0;
+
+        // Adiciona detalhes visuais baseados no tipo de componente
+        if (comp.pinos === "direita" || comp.pinos === "esquerda") {
+            ctx.fillStyle = "#ffd700"; // Conectores banhados a ouro
+            let pinoX = comp.pinos === "direita" ? comp.x + comp.w : comp.x - 4;
+            for (let pinoY = comp.y + 10; pinoY < comp.y + comp.h - 5; pinoY += 6) {
+                ctx.fillRect(pinoX, pinoY, 4, 3);
+            }
+        }
+
+        if (comp.detalhes === "socket") {
+            ctx.strokeStyle = "rgba(255,255,255,0.06)";
+            for(let camadaSocket = 15; camadaSocket < comp.w - 15; camadaSocket += 10) {
+                ctx.strokeRect(comp.x + camadaSocket, comp.y + camadaSocket, comp.w - (camadaSocket*2), comp.h - (camadaSocket*2));
+            }
+        }
+
+        if (comp.detalhes === "capacitores") {
+            for (let capY = comp.y + 15; capY < comp.y + comp.h; capY += 30) {
+                ctx.fillStyle = "#4b5563";
+                ctx.beginPath(); ctx.arc(comp.x + comp.w/2, capY, 8, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#9ca3af";
+                ctx.beginPath(); ctx.arc(comp.x + comp.w/2, capY, 5, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        if (comp.detalhes === "dissipador") {
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            for(let grelhaX = comp.x + 10; grelhaX < comp.x + comp.w - 10; grelhaX += 12) {
+                ctx.fillRect(grelhaX, comp.y + 10, 6, comp.h - 20);
+            }
+        }
+
+        // Texto identificador do componente
+        ctx.fillStyle = "#f3f4f6";
+        ctx.font = "bold 10px 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(comp.nome, comp.x + comp.w / 2, comp.y + comp.h / 2);
+    });
+}
+
+function atualizarEAnimar() {
+    desenharPlaca();
+
+    // 4. Animação dos Elétrons Luminosos
+    trilhas.forEach(trilha => {
+        trilha.pulsoPos += (trilha.velocidade / 250);
+        if (trilha.pulsoPos > 1) trilha.pulsoPos = 0; 
+
+        let posicaoAtual = obterPontoNaTrilha(trilha.pontos, trilha.pulsoPos);
+
+        if (posicaoAtual) {
+            ctx.shadowBlur = 14;
+            ctx.shadowColor = trilha.tipo === "video" ? "#00ffff" : "#00ff88";
+            
+            ctx.fillStyle = "#ffffff";
+            ctx.beginPath();
+            ctx.arc(posicaoAtual.x, posicaoAtual.y, 3.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0; 
+        }
+    });
+
+    requestAnimationFrame(atualizarEAnimar);
+}
+
+// Inicializa a renderização contínua
+atualizarEAnimar();
+</script>
+
+</body>
+</html>

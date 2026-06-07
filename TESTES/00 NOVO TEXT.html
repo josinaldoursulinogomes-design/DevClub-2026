@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pré-Cadastro - ETS Cursos</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; background: white; margin: 0 auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #0056b3; font-size: 22px; margin-bottom: 5px; }
+        h2 { text-align: center; color: #666; font-size: 14px; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+        .secao-titulo { border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; color: #0056b3; font-size: 16px; font-weight: bold; }
+        .campo { margin-bottom: 15px; display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input, select { padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #0056b3; outline: none; }
+        .termo-box { background: #f9f9f9; border: 1px solid #ddd; padding: 15px; height: 120px; overflow-y: scroll; font-size: 12px; margin-bottom: 15px; border-radius: 4px; line-height: 1.6; }
+        .checkbox-container { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; margin-bottom: 25px; }
+        .checkbox-container input { margin-top: 3px; cursor: pointer; }
+        button { width: 100%; padding: 12px; background-color: #0056b3; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        button:hover { background-color: #003d80; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ETS CURSOS</h1>
+    <h2>Escola de Tecnologia e Serviços</h2>
+
+    <form action="#" method="POST">
+        
+        <div class="secao-titulo">DADOS DO ALUNO</div>
+
+        <div class="campo">
+            <label for="nome">Nome Completo do Aluno(a):</label>
+            <input type="text" id="nome" name="nome" autocomplete="name" required placeholder="Digite o nome completo">
+        </div>
+
+        <div class="campo">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" autocomplete="email" required placeholder="exemplo@email.com">
+        </div>
+
+        <div class="campo">
+            <label for="endereco">Endereço Residencial:</label>
+            <input type="text" id="endereco" name="endereco" autocomplete="address-line1" required placeholder="Rua, Número, Bairro">
+        </div>
+
+        <div class="campo">
+            <label for="nascimento">Data de Nascimento:</label>
+            <input type="date" id="nascimento" name="nascimento" required>
+        </div>
+
+        <div class="secao-titulo">INFORMAÇÕES DO CURSO E PAGAMENTO</div>
+
+        <div class="campo">
+            <label for="curso">Curso Selecionado:</label>
+            <input type="text" id="curso" name="curso" value="INFORMÁTICA" readonly style="background-color: #e9ecef; font-weight: bold;">
+        </div>
+
+        <div class="campo">
+            <label for="primeiro_dia">Primeiro Dia de Aula:</label>
+            <input type="date" id="primeiro_dia" name="primeiro_dia" value="2026-02-26" readonly style="background-color: #e9ecef;">
+        </div>
+
+        <div class="campo">
+            <label for="vencimento_mensalidade">Melhor Data para a 1ª Mensalidade:</label>
+            <input type="date" id="vencimento_mensalidade" name="vencimento_mensalidade" required>
+        </div>
+
+        <div class="campo">
+            <label for="forma_pagamento">Forma de Pagamento Desejada:</label>
+            <select id="forma_pagamento" name="forma_pagamento" required>
+                <option value="" disabled selected>Selecione uma opção</option>
+                <option value="pix">PIX</option>
+                <option value="carne">Carnê Próprio (Pago na Escola)</option>
+            </select>
+        </div>
+
+        <div class="secao-titulo">CONTRATO E REGRAS GERAIS</div>
+        
+        <!-- Caixa de texto com rolagem contendo o resumo das regras do seu contrato -->
+        <div class="termo-box">
+            <strong>Resumo dos Termos Principais:</strong><br>
+            1. O curso de INFORMÁTICA terá parcelas mensais de R$ 100,00.<br>
+            2. Em caso de desistência, será cobrada uma taxa de 40% sobre o valor das parcelas restantes.<br>
+            3. O certificado gratuito exige frequência mínima de 80% da carga horária.<br>
+            4. A ausência em sala de aula não anula as mensalidades devidas.<br>
+            5. Foro eleito: Comarca de Parelhas/RN.
+        </div>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="concordo" name="concordo" required>
+            <label for="concordo">Li e concordo com os termos do contrato de prestação de serviços educacionais da ETS Cursos acima mencionados.</label>
+        </div>
+
+        <button type="submit">Enviar Pré-Cadastro</button>
+
+    </form>
+</div>
+
+</body>
+</html>
