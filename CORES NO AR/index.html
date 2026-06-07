@@ -27,12 +27,13 @@
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             background: #fafafa;
+            position: relative;
         }
         .btn-cor {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            border: 3px solid #fff;
+            border: 4px solid #fff; /* Borda padrão branca */
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             cursor: pointer;
             margin: 10px;
@@ -40,10 +41,16 @@
             font-size: 12px;
             color: white;
             text-shadow: 1px 1px 2px #000;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
         }
         .btn-cor:hover { transform: scale(1.1); }
-        .btn-cor.selecionado { border: 3px solid #333; transform: scale(1.05); }
+        
+        /* ESTILO DO BOTÃO SELECIONADO: Ganha destaque e borda escura */
+        .btn-cor.selecionado { 
+            border: 5px solid #222 !important; 
+            transform: scale(1.15);
+            box-shadow: 0 0 12px rgba(0,0,0,0.4);
+        }
         
         .resultado-box {
             margin-top: 20px;
@@ -64,6 +71,7 @@
             font-size: 20px;
             font-weight: bold;
             color: #333;
+            margin-bottom: 10px;
         }
         button.action-btn {
             background-color: #007bff;
@@ -73,9 +81,22 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            margin-top: 10px;
+            margin: 5px;
         }
         button.action-btn:hover { background-color: #0056b3; }
+        
+        /* Botão estilizado para Zerar */
+        button.reset-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button.reset-btn:hover { background-color: #bd2130; }
         
         .slider-control {
             margin: 15px 0;
@@ -91,12 +112,13 @@
 
 <div class="container">
     <h1>Laboratório de Cores e Linhas - 6º Ano</h1>
+    <button> by: Josinaldo Ursulino </button>
     <p>Fale a cor em voz alta com o colega antes de clicar em "Revelar"!</p>
 
-    <div class="fase">
+    <div class="fase" id="fase1">
         <h2>Fase 1: Misturando Cores Primárias</h2>
         <p>Escolha duas cores primárias:</p>
-        <button class="btn-cor" style="background-color: #ff0000;" onclick="selecionarFase1(this, 'azul')">Azul</button>
+        <button class="btn-cor" style="background-color: #0000ff;" onclick="selecionarFase1(this, 'azul')">Azul</button>
         <button class="btn-cor" style="background-color: #ffcc00; color: black; text-shadow: none;" onclick="selecionarFase1(this, 'amarelo')">Amarelo</button>
         <button class="btn-cor" style="background-color: #ff0000;" onclick="selecionarFase1(this, 'vermelho')">Vermelho</button>
         
@@ -104,17 +126,18 @@
             <button class="action-btn" id="btn-revelar-1" style="display:none;" onclick="revelarFase1()">Diga a resposta e clique para Revelar</button>
             <div id="circulo-1" class="circulo-resultado"></div>
             <div id="nome-1" class="nome-cor"></div>
+            <button class="reset-btn" onclick="zerarFase1()">Zerar Fase 1</button>
         </div>
     </div>
 
-    <div class="fase">
+    <div class="fase" id="fase2">
         <h2>Fase 2: Cores Terciárias</h2>
         <p>Escolha uma Primária e uma Secundária:</p>
         <div>
             <small>Primárias:</small><br>
             <button class="btn-cor" style="background-color: #ff0000;" onclick="selecionarFase2('p', this, 'vermelho')">Vermelho</button>
             <button class="btn-cor" style="background-color: #ffcc00; color: black; text-shadow: none;" onclick="selecionarFase2('p', this, 'amarelo')">Amarelo</button>
-            <button class="btn-cor" style="background-color: #ff0000;" onclick="selecionarFase2('p', this, 'azul')">Azul</button>
+            <button class="btn-cor" style="background-color: #0000ff;" onclick="selecionarFase2('p', this, 'azul')">Azul</button>
         </div>
         <div>
             <small>Secundárias:</small><br>
@@ -127,10 +150,11 @@
             <button class="action-btn" id="btn-revelar-2" style="display:none;" onclick="revelarFase2()">Diga a resposta e clique para Revelar</button>
             <div id="circulo-2" class="circulo-resultado"></div>
             <div id="nome-2" class="nome-cor"></div>
+            <button class="reset-btn" onclick="zerarFase2()">Zerar Fase 2</button>
         </div>
     </div>
 
-    <div class="fase">
+    <div class="fase" id="fase3">
         <h2>Fase 3: Mistura por Porcentagem</h2>
         <p>Ajuste as quantidades para criar novas tonalidades:</p>
         
@@ -154,12 +178,13 @@
             <button class="action-btn" onclick="misturarPorcentagem()">Adivinhe a cor e clique para Misturar</button>
             <div id="circulo-3" class="circulo-resultado" style="display:block; background-color: #009900;"></div>
             <div id="nome-3" class="nome-cor">Verde (Equilibrado)</div>
+            <button class="reset-btn" onclick="zerarFase3()">Zerar Sliders</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Lógica da Fase 1
+    // --- LÓGICA DA FASE 1 ---
     let escolhasFase1 = [];
     function selecionarFase1(btn, cor) {
         if (btn.classList.contains('selecionado')) {
@@ -201,11 +226,22 @@
         }
     }
 
-    // Lógica da Fase 2
+    function zerarFase1() {
+        escolhasFase1 = [];
+        const botoes = document.querySelectorAll('#fase1 .btn-cor');
+        botoes.forEach(b => b.classList.remove('selecionado'));
+        document.getElementById('btn-revelar-1').style.display = 'none';
+        document.getElementById('circulo-1').style.display = 'none';
+        document.getElementById('nome-1').innerText = '';
+    }
+
+
+    // --- LÓGICA DA FASE 2 ---
     let primariaFase2 = '';
     let secundariaFase2 = '';
 
     function selecionarFase2(tipo, btn, cor) {
+        // Remove a seleção apenas do bloco correspondente (ou primária ou secundária)
         const botoes = btn.parentNode.querySelectorAll('.btn-cor');
         botoes.forEach(b => b.classList.remove('selecionado'));
         
@@ -227,7 +263,6 @@
         
         const mistura = `${primariaFase2}+${secundariaFase2}`;
         
-        // Mapeamento das Terciárias
         const coresTerciarias = {
             'vermelho+laranja': { hex: '#ff4500', nome: 'Vermelho-alaranjado' },
             'amarelo+laranja': { hex: '#ffaa00', nome: 'Amarelo-alaranjado' },
@@ -237,7 +272,6 @@
             'vermelho+roxo': { hex: '#c71585', nome: 'Vermelho-arroxeado (Magneta/Vinho)' }
         };
 
-        // Fallback caso escolham misturas que anulam (ex: amarelo + roxo)
         if (coresTerciarias[mistura]) {
             circulo.style.backgroundColor = coresTerciarias[mistura].hex;
             nome.innerText = coresTerciarias[mistura].nome.toUpperCase();
@@ -247,12 +281,25 @@
         }
     }
 
-    // Lógica da Fase 3
-    function actualizarLabels() {
+    function zerarFase2() {
+        primariaFase2 = '';
+        secundariaFase2 = '';
+        const botoes = document.querySelectorAll('#fase2 .btn-cor');
+        botoes.forEach(b => b.classList.remove('selecionado'));
+        document.getElementById('btn-revelar-2').style.display = 'none';
+        document.getElementById('circulo-2').style.display = 'none';
+        document.getElementById('nome-2').innerText = '';
+    }
+
+
+    // --- LÓGICA DA FASE 3 ---
+    function atualizarLabels() {
         document.getElementById('val-amarelo').innerText = document.getElementById('porcentagem-amarelo').value + '%';
         document.getElementById('val-vermelho').innerText = document.getElementById('porcentagem-vermelho').value + '%';
         document.getElementById('val-azul').innerText = document.getElementById('porcentagem-azul').value + '%';
     }
+
+    window.onload = atualizarLabels;
 
     function misturarPorcentagem() {
         let y = parseInt(document.getElementById('porcentagem-amarelo').value);
@@ -260,14 +307,12 @@
         let b = parseInt(document.getElementById('porcentagem-azul').value);
         
         let total = y + r + b;
-        if (total === 0) { y = 1; r = 1; b = 1; total = 3; } // Evita divisão por zero
+        if (total === 0) { y = 1; r = 1; b = 1; total = 3; }
         
-        // Conversão simples para RGB baseado nas proporções
         let redComponent = Math.round((r * 255 + y * 255) / total);
         let greenComponent = Math.round((y * 200 + b * 100) / total); 
         let blueComponent = Math.round((b * 255) / total);
         
-        // Limitar valores máximos do RGB
         redComponent = Math.min(255, redComponent);
         greenComponent = Math.min(255, greenComponent);
         blueComponent = Math.min(255, blueComponent);
@@ -277,11 +322,21 @@
         
         circulo.style.backgroundColor = `rgb(${redComponent}, ${greenComponent}, ${blueComponent})`;
         
-        // Identificação aproximada pedagógica para o 6º ano
         if (y > r && y > b) nome.innerText = `Tom predominantemente Amarelado (${y}%)`;
         else if (r > y && r > b) nome.innerText = `Tom predominantemente Avermelhado (${r}%)`;
         else if (b > y && b > r) nome.innerText = `Tom predominantemente Azulado (${b}%)`;
         else nome.innerText = "Tom Neutro / Composto";
+    }
+
+    function zerarFase3() {
+        document.getElementById('porcentagem-amarelo').value = 50;
+        document.getElementById('porcentagem-vermelho').value = 0;
+        document.getElementById('porcentagem-azul').value = 50;
+        atualizarLabels();
+        
+        // Retorna o círculo padrão (Verde equilibrado 50/50)
+        document.getElementById('circulo-3').style.backgroundColor = '#009900';
+        document.getElementById('nome-3').innerText = 'Verde (Equilibrado)';
     }
 </script>
 
